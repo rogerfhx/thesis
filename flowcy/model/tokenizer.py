@@ -25,10 +25,12 @@ standard_amino_acids = {"Alanine": {"3-letter": "Ala", "1-letter": "A"},
                         "Tyrosine": {"3-letter": "Tyr", "1-letter": "Y"},
                         "Valine": {"3-letter": "Val", "1-letter": "V"}}
 
+
 non_standard_amino_acid = {"Asparagine": {"3-letter": "Asx", "1-letter": "B"},
                            "Selenocysteine": {"3-letter": "Sec", "1-letter": "U"},
                            "Glutamic acid": {"3-letter": "Glx", "1-letter": "Z"},
                            "Ornithine": {"3-letter": "Orn", "1-letter": "O"},}
+
 
 special_token = {"Seperation": {"3-letter": "Sep"},
                  "Unknown": {"3-letter": "Unk", "1-letter": "X"},
@@ -44,24 +46,17 @@ tokens = ["A", "R", "N", "D", "C", "Q", "E", "G", "H", "I",
 
 
 class tokenizer():
-    def __init__(self, binder_seq: str, receptor_seq: str, is_complex: bool):
+    def __init__(self, binder_seq: str, receptor_seq: str|None, is_complex: bool|None):
         self.binder_seq = binder_seq
         self.receptor_seq = receptor_seq
         self.is_complex = is_complex
-
-
-    def preprocess(self):
-        """
-        add special token 
-        """
         
 
     def encode(self) -> torch.tensor:
         """
         map token to token ID
         """
-        processed_seq = self.preprocess(self.seq)
-        seq_tokenID = torch.tensor([tokens.index(token)] for token in processed_seq)
+        seq_tokenID = torch.tensor([tokens.index(token) for token in self.binder_seq])
         return seq_tokenID
 
 
