@@ -1,6 +1,9 @@
 import torch
+import torch.nn as nn
 
-from embedding import token_embedding, segment_embedding, rotary_position_embedding, time_embedding
+from embedding import token_embedding, segment_embedding, time_embedding
+
+from transformer import transformer_stack
 
 # Overview
 # - Denoiser that combine embedding and transformer to predict the amino acid
@@ -36,15 +39,30 @@ class embeddings_layer():
 
 
 class output_layer():
+    """
+    output the predicted logit for each amino acid in the sequences
+    """
+
+    def __init__(self, inputs:torch.tensor, d_model:int, num_vocab:int):
+        self.inputs = inputs
+        self.d_model = d_model
+        self.num_token = inputs.shape[0]
+        self.nn = nn.Sequential(nn.Linear(d_model, d_model), nn.Relu(), 
+                                nn.LayerNorm(d_model), nn.Linear(d_model, num_vocab))
+        
+    def forward(self):
+        return self.nn(self.inputs)
 
 
 
 class cytokine_model():
-
     def __init__(self):
+        self.embedding = embeddings_layer()
+        self.transformer = transformer_stack()
+        self.output_head = output_layer()
 
 
     def forward(self):
         """
-        embed --> transformer --> MLP
+        embed --> transformer --> MLP 
         """
