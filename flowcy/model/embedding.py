@@ -47,28 +47,31 @@ class segment_embedding():
 
 
 class rotary_position_embedding():
-    def __init__(self, query, key):
+    def __init__(self, num_token:int, d_model:int, query:torch.tensor, key:torch.tensor):
+        self.num_token = num_token
         self.query = query
         self.key = key
+        self.d_model = d_model
 
 
-    def get_frequencies(self, token_position: int, d_model: int):
+    def _get_frequencies(self):
         """
         i in {1, 2, ..., d/2}
         """
-        frequencies = torch.ones(d_model)
-        i = torch.arange(d_model)
+        frequencies = torch.ones(self.d_model)
+        token_position = torch.arange(self.num_token)
+        i = torch.arange(self.d_model)
         i = torch.div(i, 2, rounding_mode="floor") - 1
-        frequencies = token_position * (d_model) * ((1e4) ** (-2 * i / d_model))
+        frequencies = token_position * ((1e4) ** (-2 * i / self.d_model))
         return frequencies
 
 
-    def rotate(self, matrix:torch.tensor, token_position: int, d_model: int):
+    def rotate(self, matrix:torch.tensor, d_model: int):
         """
         rotate the query and key vector using element wise multiplication
         rotation matrix = [mθ_1, ..., mθ_{d/2}]
         """
-        frequencies = self.get_frequencies(token_position, d_model)
+        frequencies = self.get_frequencies(d_model)
 
         indices = torch.arange(matrix.shape[0])
         indices_even_copy = indices[0::2].clone()
